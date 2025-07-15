@@ -34,7 +34,7 @@ setup(
     install_requires=[
         'numpy',
         'requests',
-        'jwcrypto',
+        'jwcrypto>=0.9.0',
         'redis',
     ],
     zip_safe=False,
