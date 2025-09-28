@@ -40,7 +40,7 @@
 
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
-    static void * (*func)();
+    static void * (*func)(int, const struct sockaddr *, socklen_t);
     int do_move = 0;
     struct sockaddr_in * addr_in = (struct sockaddr_in *)addr;
     struct sockaddr_in addr_tmp;
@@ -48,7 +48,7 @@ int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     char * PORT_OLD, * PORT_NEW, * end1, * end2;
     int ret, oldport, newport, askport = htons(addr_in->sin_port);
     uint32_t askaddr = htons(addr_in->sin_addr.s_addr);
-    if (!func) func = (void *(*)()) dlsym(RTLD_NEXT, "bind");
+    if (!func) func = (void *(*)(int, const struct sockaddr *, socklen_t)) dlsym(RTLD_NEXT, "bind");
 
     DEBUG(">> bind(%d, _, %d), askaddr %d, askport %d\n",
           sockfd, addrlen, askaddr, askport);
@@ -87,7 +87,7 @@ int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     /* Bind to other port on the loopback instead */
     addr_tmp.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     addr_tmp.sin_port = htons(newport);
-    ret = (long) func(sockfd, &addr_tmp, addrlen_tmp);
+    ret = (long) func(sockfd, (const struct sockaddr *)&addr_tmp, addrlen_tmp);
 
     DEBUG("<< bind(%d, _, %d) ret %d\n", sockfd, addrlen, ret);
     return ret;
