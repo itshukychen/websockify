@@ -3,6 +3,9 @@ FROM python:3-alpine AS builder
 
 WORKDIR /build
 
+# Install build dependencies
+RUN pip install --no-cache-dir setuptools
+
 # Copy only what's needed to build the distribution
 COPY setup.py MANIFEST.in README.md COPYING CHANGES.txt ./
 COPY websockify/ ./websockify/

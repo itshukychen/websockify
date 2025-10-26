@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 set -e -x
-cd "$(dirname "$0")"
-# Build from parent directory to include all source files in context
-docker build -f Dockerfile -t novnc/websockify ..
+# Change to websockify root directory
+cd "$(dirname "$0")/.."
+# Build using the Dockerfile in the root
+docker build -t novnc/websockify .
