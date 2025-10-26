@@ -20,11 +20,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare
+        run: ./docker/build.sh
+
       - name: Build & push
         id: bp
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./docker
           push: true
           platforms: linux/amd64
           tags: |
