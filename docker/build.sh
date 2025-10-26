@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 set -e -x
 cd "$(dirname "$0")"
-(cd .. && python3 setup.py sdist --dist-dir docker/)
-docker build -t novnc/websockify .
+# Build from parent directory to include all source files in context
+docker build -f Dockerfile -t novnc/websockify ..
