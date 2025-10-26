@@ -1,0 +1,48 @@
+name: Build & Push (API)
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push
+        id: bp
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:latest
+            
+      - name: Show digest
+        run: echo "Digest is ${{ steps.bp.outputs.digest }}"
+      
+      - name: Notify ops repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.OPSPROD_DISPATCH_TOKEN }}
+          repository: itshukychen/investment-ops
+          event-type: image-published
+          client-payload: >
+            {
+              "service": "websockify",
+              "image": "ghcr.io/${{ github.repository }}",
+              "digest": "${{ steps.bp.outputs.digest }}"
+            }
