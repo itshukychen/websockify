@@ -18,6 +18,9 @@ RUN python3 setup.py sdist --dist-dir /dist
 # Production stage - install and run
 FROM python:3-alpine AS runner
 
+# Install netcat for healthchecks
+RUN apk add --no-cache netcat-openbsd
+
 # Install the package from the built distribution
 COPY --from=builder /dist/websockify-*.tar.gz /tmp/
 RUN python3 -m pip install --no-cache-dir /tmp/websockify-*.tar.gz && \
